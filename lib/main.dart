@@ -5,7 +5,7 @@ import 'package:taketest/reset_new_password_screen.dart';
 
 import 'auth_service.dart';   // assuming this exports supabase or you use Supabase.instance.client
 import 'login_screen.dart';
-import 'home_screen.dart';
+import 'dashboard_router.dart';
 
 final supabase = Supabase.instance.client;
 
@@ -32,9 +32,9 @@ void main() async {
       if (AuthService.isInRecoveryFlow) {
         print('→ SIGNED IN during password recovery – ignoring (manual nav to reset screen)');
       } else {
-        print('→ SIGNED IN – navigating to Home');
+        print('→ SIGNED IN – navigating to DashboardRouter');
         navigatorKey.currentState?.pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          MaterialPageRoute(builder: (_) => const DashboardRouter()),
           (route) => false, // clear all previous routes
         );
       }
@@ -87,7 +87,7 @@ class MyApp extends StatelessWidget {
       title: 'Supabase Auth Test',
       debugShowCheckedModeBanner: false,
       home: supabase.auth.currentSession != null
-          ? const HomeScreen()
+          ? const DashboardRouter()
           : const LoginScreen(),
     );
   }

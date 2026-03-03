@@ -53,6 +53,18 @@ class AuthService {
       );
       print('signInWithPassword success');
       await supabase.auth.refreshSession(); // force refresh to test if it helps
+
+      final role = await getUserRole();
+      if (role != null) {
+        final userId = supabase.auth.currentUser?.id;
+        if (userId != null) {
+          await supabase.from('user_roles').upsert({
+            'user_id': userId,
+            'role_id': 2, 
+          });
+          print('Default role assigned for new user');
+        }
+      }
       return null;
     } on AuthException catch (e) {
       return e.message;
@@ -105,6 +117,23 @@ class AuthService {
       return e.message;
     } catch (e) {
       return 'Unexpected error: $e';
+    }
+  }
+
+  Future<int?> getUserRole() async {
+    try {
+      final user = supabase.auth.currentUser;
+      if (user == null) return null;
+
+      final response = await supabase
+          .from('user_roles')
+          .select('role_id')
+          .eq('user_id', user.id)
+          .maybeSingle(); 
+      return response?['role_id'] as int?;
+    } catch (e) {
+      print('Error fetching role: $e');
+      return null;
     }
   }
 
